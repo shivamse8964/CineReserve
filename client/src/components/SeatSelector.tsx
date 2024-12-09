@@ -35,7 +35,7 @@ export function SeatSelector({ seats, selectedSeats, onSeatSelect }: SeatSelecto
                   <button
                     key={seat.id}
                     onClick={() => onSeatSelect(seat)}
-                    disabled={seat.isBooked}
+                    disabled={seat.isBooked || false}
                     className={cn(
                       "w-8 h-8 rounded transition-colors",
                       seat.isBooked && "bg-muted cursor-not-allowed",

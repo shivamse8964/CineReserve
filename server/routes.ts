@@ -70,7 +70,7 @@ export function registerRoutes(app: Express) {
         .where(
           and(
             eq(seats.showtimeId, showtimeId),
-            seats.id.in(seatIds)
+            seats.id.in(seatIds as number[])
           )
         );
 
@@ -105,7 +105,7 @@ export function registerRoutes(app: Express) {
 
         // Update seats to booked
         await Promise.all(
-          seatIds.map(seatId =>
+          seatIds.map((seatId: number) =>
             tx
               .update(seats)
               .set({ isBooked: true })
