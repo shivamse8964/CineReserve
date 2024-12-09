@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { setupAuth } from "./auth";
 import { db } from "../db";
 import { movies, showtimes, seats, bookings } from "@db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express) {
   // Set up authentication routes
@@ -70,7 +70,7 @@ export function registerRoutes(app: Express) {
         .where(
           and(
             eq(seats.showtimeId, showtimeId),
-            seats.id.in(seatIds as number[])
+            sql`${seats.id} = ANY(${seatIds})`
           )
         );
 
@@ -91,18 +91,22 @@ export function registerRoutes(app: Express) {
 
       // Start transaction
       await db.transaction(async (tx) => {
-        // Create booking
-        const [booking] = await tx
-          .insert(bookings)
-          .values({
-            userId: req.user!.id,
-            showtimeId,
-            seatId: seatIds[0], // First seat for reference
-            totalAmount: showtime.price * seatIds.length,
-            status: "confirmed"
-          })
-          .returning();
+        // Create bookings for each seat
+        const bookingPromises = seatIds.map((seatId: number) =>
+          tx
+            .insert(bookings)
+            .values({
+              userId: req.user!.id,
+              showtimeId,
+              seatId,
+              totalAmount: showtime.price,
+              status: "confirmed"
+            })
+            .returning()
+        );
 
+        const bookingResults = await Promise.all(bookingPromises);
+        
         // Update seats to booked
         await Promise.all(
           seatIds.map((seatId: number) =>
@@ -113,7 +117,7 @@ export function registerRoutes(app: Express) {
           )
         );
 
-        res.json(booking);
+        res.json(bookingResults.map(([booking]) => booking));
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to create booking" });
