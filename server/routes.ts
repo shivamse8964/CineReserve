@@ -70,7 +70,7 @@ export function registerRoutes(app: Express) {
         .where(
           and(
             eq(seats.showtimeId, showtimeId),
-            sql`${seats.id} = ANY(ARRAY[${seatIds.join(', ')}]::integer[])`
+            sql`${seats.id} = ANY(${sql.array(seatIds, 'int4')})`
           )
         );
 
