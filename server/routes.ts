@@ -140,4 +140,18 @@ export function registerRoutes(app: Express) {
       res.status(500).json({ error: "Failed to fetch bookings" });
     }
   });
+
+  // Delete database tables
+  app.delete("/api/database", async (req, res) => {
+    try {
+      await db.delete(bookings);
+      await db.delete(seats);
+      await db.delete(showtimes);
+      await db.delete(movies);
+      await db.delete(users);
+      res.json({ message: "Database cleared successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to clear database" });
+    }
+  });
 }
