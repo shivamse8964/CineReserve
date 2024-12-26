@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { setupAuth } from "./auth";
 import { db } from "../db";
-import { movies, showtimes, seats, bookings } from "@db/schema";
+import { movies, showtimes, seats, bookings, users } from "@db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express) {
