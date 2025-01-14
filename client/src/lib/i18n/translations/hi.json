@@ -1,0 +1,18 @@
+{
+  "common": {
+    "bookTicket": "टिकट बुक करें",
+    "search": "फ़िल्में खोजें...",
+    "nowShowing": "अभी दिखाई जा रही",
+    "screen": "स्क्रीन",
+    "available": "उपलब्ध",
+    "selected": "चयनित",
+    "booked": "बुक की गई",
+    "heroTitle": "अपना मूवी अनुभव बुक करें",
+    "heroSubtitle": "नवीनतम फिल्में परम आराम में देखें"
+  },
+  "languages": {
+    "en": "English",
+    "hi": "हिंदी",
+    "ur": "اردو"
+  }
+}

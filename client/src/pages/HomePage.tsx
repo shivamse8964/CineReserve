@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Navbar } from "../components/Navbar";
 import { MovieCard } from "../components/MovieCard";
 import { BookingModal } from "../components/BookingModal";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import type { Movie } from "@db/schema";
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const { data: movies, isLoading } = useQuery<Movie[]>({
-    queryKey: ["movies"],
+    queryKey: ["/api/movies"],
     queryFn: async () => {
       const response = await fetch("/api/movies");
       if (!response.ok) throw new Error("Failed to fetch movies");
@@ -26,9 +29,9 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <Navbar />
-      
+
       {/* Hero Section */}
       <div 
         className="h-[50vh] relative bg-cover bg-center"
@@ -38,12 +41,12 @@ export default function HomePage() {
         }}
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">Book Your Movie Experience</h1>
-          <p className="text-xl mb-8">Watch the latest movies in ultimate comfort</p>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">{t('common.heroTitle')}</h1>
+          <p className="text-xl mb-8">{t('common.heroSubtitle')}</p>
           <div className="w-full max-w-md px-4 relative">
             <Input
               type="text"
-              placeholder="Search movies..."
+              placeholder={t('common.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10"
@@ -55,7 +58,7 @@ export default function HomePage() {
 
       {/* Movies Grid */}
       <div className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-6">Now Showing</h2>
+        <h2 className="text-3xl font-bold mb-6">{t('common.nowShowing')}</h2>
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((n) => (
@@ -83,6 +86,9 @@ export default function HomePage() {
           onClose={() => setSelectedMovie(null)}
         />
       )}
+
+      {/* Language Switcher */}
+      <LanguageSwitcher />
     </div>
   );
 }

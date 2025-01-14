@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
 import { Loader2 } from "lucide-react";
 import { useUser } from "./hooks/use-user";
+import "./lib/i18n"; // Import i18n configuration
 
 function Router() {
   const { user, isLoading } = useUser();

@@ -1,0 +1,18 @@
+{
+  "common": {
+    "bookTicket": "Book Ticket",
+    "search": "Search movies...",
+    "nowShowing": "Now Showing",
+    "screen": "Screen",
+    "available": "Available",
+    "selected": "Selected",
+    "booked": "Booked",
+    "heroTitle": "Book Your Movie Experience",
+    "heroSubtitle": "Watch the latest movies in ultimate comfort"
+  },
+  "languages": {
+    "en": "English",
+    "hi": "हिंदी",
+    "ur": "اردو"
+  }
+}
