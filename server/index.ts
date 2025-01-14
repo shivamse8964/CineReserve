@@ -2,8 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
-import { db } from "../db";
-import { sql } from "drizzle-orm";
+import { getConnection } from "../db";
 
 function log(message: string) {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -17,6 +16,18 @@ function log(message: string) {
 }
 
 const app = express();
+
+// Add better error handling for uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -59,10 +70,25 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 (async () => {
   try {
-    // Test database connection
+    log("Starting application initialization...");
+
+    // Test database connection with timeout
     log("Testing database connection...");
-    await db.execute(sql`SELECT 1`);
-    log("Database connection successful");
+    const dbTimeout = setTimeout(() => {
+      console.error("Database connection timeout after 5 seconds");
+      process.exit(1);
+    }, 5000);
+
+    try {
+      const { sql } = await getConnection();
+      await sql`SELECT 1`;
+      clearTimeout(dbTimeout);
+      log("Database connection successful");
+    } catch (dbError) {
+      clearTimeout(dbTimeout);
+      console.error("Database connection failed:", dbError);
+      process.exit(1);
+    }
 
     // Initialize routes and server
     log("Initializing server...");
@@ -83,8 +109,13 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
     // Start server
     const port = parseInt(process.env.PORT || "5000", 10);
+    log(`Attempting to start server on port ${port}...`);
+
     server.listen(port, "0.0.0.0", () => {
       log(`Server is running on port ${port}`);
+    }).on('error', (err) => {
+      console.error('Failed to start server:', err);
+      process.exit(1);
     });
 
   } catch (error) {
