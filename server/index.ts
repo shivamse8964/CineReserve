@@ -51,6 +51,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Error handling middleware
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("Error:", err);
+  res.status(500).json({ error: err.message || "Internal Server Error" });
+});
+
 (async () => {
   try {
     // Test database connection
@@ -58,18 +64,13 @@ app.use((req, res, next) => {
     await db.execute(sql`SELECT 1`);
     log("Database connection successful");
 
+    // Initialize routes and server
+    log("Initializing server...");
+    const server = createServer(app);
+
     // Register API routes
     log("Registering API routes...");
     registerRoutes(app);
-    const server = createServer(app);
-
-    // Error handling middleware
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      console.error('Error:', err);
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
-      res.status(status).json({ message });
-    });
 
     // Setup Vite or serve static files
     if (app.get("env") === "development") {
@@ -81,12 +82,13 @@ app.use((req, res, next) => {
     }
 
     // Start server
-    const PORT = 5000;
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`Server is running on port ${PORT}`);
+    const port = parseInt(process.env.PORT || "5000", 10);
+    server.listen(port, "0.0.0.0", () => {
+      log(`Server is running on port ${port}`);
     });
+
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error("Failed to start server:", error);
     process.exit(1);
   }
 })();

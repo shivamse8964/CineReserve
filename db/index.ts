@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import ws from "ws";
+import { neonConfig, neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from "@db/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -8,8 +8,18 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const db = drizzle({
-  connection: process.env.DATABASE_URL,
-  schema,
-  ws: ws,
-});
+// Configure neon
+neonConfig.fetchConnectionCache = true;
+
+// Create connection with better error handling
+const createConnection = () => {
+  try {
+    const sql = neon(process.env.DATABASE_URL!);
+    return drizzle(sql, { schema });
+  } catch (error) {
+    console.error("Failed to create database connection:", error);
+    throw error;
+  }
+};
+
+export const db = createConnection();
