@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
 import { db } from "../db";
-import { sql } from 'sql-template-strings';
+import { sql } from "drizzle-orm";
 
 function log(message: string) {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -54,10 +54,12 @@ app.use((req, res, next) => {
 (async () => {
   try {
     // Test database connection
+    log("Testing database connection...");
     await db.execute(sql`SELECT 1`);
     log("Database connection successful");
 
     // Register API routes
+    log("Registering API routes...");
     registerRoutes(app);
     const server = createServer(app);
 
@@ -71,8 +73,10 @@ app.use((req, res, next) => {
 
     // Setup Vite or serve static files
     if (app.get("env") === "development") {
+      log("Setting up Vite development server...");
       await setupVite(app, server);
     } else {
+      log("Setting up static file serving...");
       serveStatic(app);
     }
 
