@@ -20,6 +20,12 @@ const app = express();
 // Add better error handling for uncaught exceptions
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
+  // Log environment information for debugging
+  console.error('Environment:', {
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: process.env.PORT,
+    DATABASE_URL: process.env.DATABASE_URL ? '[REDACTED]' : 'undefined'
+  });
   process.exit(1);
 });
 
