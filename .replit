@@ -15,7 +15,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Project"
+runButton = "Movie Booking App"
 
 [[workflows.workflow]]
 name = "Project"
@@ -38,5 +38,5 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "sysctl vm.overcommit_memory=1 || echo 'Continuing without setting vm.overcommit_memory' && npm run dev"
 waitForPort = 5000
